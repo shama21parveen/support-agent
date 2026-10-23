@@ -6,9 +6,9 @@ import mongoose from "mongoose";
 import Order from "./models/Order.js";
 
 const orders = [
-  { orderId: "ORD1001", customerName: "Aman", status: "Shipped", items: ["Blue Headphones"], eta: "2 din mein" },
-  { orderId: "ORD1002", customerName: "Riya", status: "Out for delivery", items: ["Running Shoes"], eta: "Aaj shaam tak" },
-  { orderId: "ORD1003", customerName: "Sana", status: "Packed", items: ["Phone Case", "Charger"], eta: "4 din mein" },
+  { orderId: "ORD1001", customerName: "Aman", status: "Shipped", items: ["Blue Headphones"], eta: "Arrives in 2 days" },
+  { orderId: "ORD1002", customerName: "Riya", status: "Out for delivery", items: ["Running Shoes"], eta: "Arrives today evening" },
+  { orderId: "ORD1003", customerName: "Sana", status: "Packed", items: ["Phone Case", "Charger"], eta: "Arrives in 4 days" },
   { orderId: "ORD1004", customerName: "Karan", status: "Delivered", items: ["Backpack"], eta: "Delivered" },
 ];
 

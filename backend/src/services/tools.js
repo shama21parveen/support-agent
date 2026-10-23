@@ -44,7 +44,7 @@ export async function runTool(name, args) {
   if (name === "get_order_status") {
     const id = String(args.orderId || "").trim().toUpperCase();
     const order = await Order.findOne({ orderId: id }).lean();
-    if (!order) return { found: false, message: `Order ${id} nahi mila` };
+   if (!order) return { found: false, message: `Order ${id} not found` };
     return {
       found: true,
       orderId: order.orderId,
@@ -69,7 +69,7 @@ export async function runTool(name, args) {
       .limit(2)
       .lean();
 
-    if (docs.length === 0) return { found: false, message: "Koi policy nahi mili" };
+    if (docs.length === 0) return { found: false, message: "No matching policy found" };
     return { found: true, docs: docs.map((d) => ({ title: d.title, content: d.content })) };
   }
 

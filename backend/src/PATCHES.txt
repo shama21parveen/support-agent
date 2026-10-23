@@ -1,0 +1,23 @@
+=== 1) CHECKOUT (new orders saved to MongoDB, Nova can track them) ===
+a) Copy order.routes.js into backend/src/routes/
+b) In backend/src/server.js add the import near the other imports:
+     import orderRoutes from "./routes/order.routes.js";
+   and this line right after app.use("/api/chat", chatRoutes);
+     app.use("/api/orders", orderRoutes);
+
+=== 2) MAKE NOVA FASTER ===
+In backend/src/services/llm.service.js change the config object to:
+
+const config = {
+  systemInstruction: SYSTEM_PROMPT,
+  tools: [{ functionDeclarations }],
+  maxOutputTokens: 500,
+  thinkingConfig: { thinkingLevel: "low" },
+};
+
+If the API complains about thinkingLevel, use this instead:
+  thinkingConfig: { thinkingBudget: 0 },
+
+=== 3) CHECK BACKEND IS RUNNING ===
+Browser: http://localhost:5000/health  ->  {"status":"ok"}
+The website now also shows Online/Offline in the chat header and footer.
