@@ -9,29 +9,19 @@ export async function sendMessage(req, res) {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    // Purani conversation dhundo ya nayi banao
-    let conversation = conversationId
-      ? await Conversation.findById(conversationId)
-      : null;
-
-    if (!conversation) {
-      conversation = new Conversation({ messages: [] });
-    }
+    let conversation = conversationId ? await Conversation.findById(conversationId) : null;
+    if (!conversation) conversation = new Conversation({ messages: [] });
 
     conversation.messages.push({ role: "user", content: message });
 
-    // LLM ko poori history bhejo
-    const history = conversation.messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }));
-
-    const reply = await getReply(history);
+    const history = conversation.messages.map((m) => ({ role: m.role, content: m.content }));
+    const { text, actions } = await getReply(history);
+    const reply = text || "Sorry, I couldn't answer that. Could you rephrase?";
 
     conversation.messages.push({ role: "assistant", content: reply });
     await conversation.save();
 
-    res.json({ reply, conversationId: conversation._id });
+    res.json({ reply, actions, conversationId: conversation._id });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong" });

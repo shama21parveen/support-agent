@@ -10,7 +10,7 @@ const docs = [
   { title: "Return Policy", content: "Products can be returned within 7 days of delivery. They must be unused, in original packaging with tags. Return pickup is free for damaged or wrong items. Innerwear and personal care items cannot be returned." },
   { title: "Shipping Policy", content: "Standard delivery takes 3-5 working days. Express delivery takes 1-2 days for an extra Rs 99. Shipping is free on orders above Rs 499. Remote areas can take up to 7 days." },
   { title: "Payment Methods", content: "We accept UPI, credit cards, debit cards, net banking and Cash on Delivery. COD has an extra charge of Rs 40 and is not available for orders above Rs 5000." },
-  { title: "Order Cancellation", content: "Orders can be cancelled before they are Packed. Shipped orders cannot be cancelled, but they can be returned after delivery. Refunds for cancelled orders arrive in 3-5 working days." },
+  { title: "Order Cancellation", content: "An order can be cancelled while its status is Packed. The customer must confirm the cancellation with the confirm button. Once an order is Shipped it cannot be cancelled, but it can be returned after delivery. Refunds for cancelled orders arrive in 3-5 working days." },
 ];
 
 await mongoose.connect(process.env.MONGO_URI);

@@ -9,6 +9,7 @@ Keep replies short, warm and clear.
 - Language: reply in English by default. Only if the customer writes in Hinglish or another language, reply in that same language.
 - If the customer asks about an order, ask for the order ID if missing, then use get_order_status.
 - If the customer asks about refund, return, shipping, payment or cancellation rules, ALWAYS use search_policy first and explain the policy from the returned text. If no policy is found, say you are not sure and offer to create a ticket.
+- If the customer wants to cancel an order, ask for the order ID if missing, then call cancel_order. This only shows a confirmation card. You can never cancel an order yourself. Never say an order is cancelled until the customer has pressed the confirm button. If cancel_order says the order cannot be cancelled, explain why in one or two sentences and offer a return or a ticket.
 - If you cannot solve the problem or the customer wants a human, use create_ticket and share the ticket ID.
 - Never make up order details. Only use tool results.`;
 
@@ -26,6 +27,7 @@ async function generateWithRetry(params, tries = 4) {
   }
 }
 
+// Returns { text, actions }. "actions" are UI instructions (like a confirm-cancel card)
 export async function getReply(messages) {
   const contents = messages.map((m) => ({
     role: m.role === "assistant" ? "model" : "user",
@@ -39,11 +41,13 @@ export async function getReply(messages) {
     thinkingConfig: { thinkingLevel: "low" },
   };
 
+  const actions = [];
+
   for (let i = 0; i < 5; i++) {
     const response = await generateWithRetry({ model: MODEL, contents, config });
 
     const calls = response.functionCalls;
-    if (!calls || calls.length === 0) return response.text;
+    if (!calls || calls.length === 0) return { text: response.text, actions };
 
     contents.push(response.candidates[0].content);
 
@@ -51,12 +55,12 @@ export async function getReply(messages) {
     for (const call of calls) {
       console.log("Tool call:", call.name, call.args);
       const output = await runTool(call.name, call.args);
-      resultParts.push({
-        functionResponse: { name: call.name, response: { result: output } },
-      });
+      const { _action, ...forModel } = output; // the model never sees the secret token
+      if (_action) actions.push(_action);
+      resultParts.push({ functionResponse: { name: call.name, response: { result: forModel } } });
     }
     contents.push({ role: "user", parts: resultParts });
   }
 
-  return "Sorry, I couldn't answer right now. Please try again in a bit.";
+  return { text: "Sorry, I couldn't answer right now. Please try again in a bit.", actions };
 }

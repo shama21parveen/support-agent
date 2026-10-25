@@ -1,5 +1,6 @@
 import { Router } from "express";
 import Order from "../models/Order.js";
+import { verifyCancel } from "../services/cancelToken.js";
 
 const router = Router();
 
@@ -22,6 +23,28 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Could not place order" });
+  }
+});
+
+// POST /api/orders/cancel  { token }  (token comes from Nova's confirmation card)
+router.post("/cancel", async (req, res) => {
+  try {
+    const orderId = verifyCancel(req.body?.token);
+    if (!orderId) return res.status(400).json({ error: "This confirmation expired. Ask Nova to cancel again." });
+
+    const order = await Order.findOne({ orderId });
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    if (order.status === "Cancelled") return res.status(409).json({ error: "This order is already cancelled" });
+    if (order.status !== "Packed") return res.status(409).json({ error: `Order is ${order.status} and can't be cancelled now` });
+
+    order.status = "Cancelled";
+    order.eta = "Cancelled";
+    await order.save();
+    console.log("Order cancelled:", orderId);
+    res.json({ orderId, status: "Cancelled", refundEta: "3-5 working days" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not cancel the order" });
   }
 });
 

@@ -8,4 +8,4 @@ export const products = [
   { name: "Steel Bottle", price: 599, emoji: "🧴", tone: "#d1f1f1", tag: "Free shipping", rating: 4.6, reviews: 402 },
   { name: "Desk Lamp", price: 1499, emoji: "💡", tone: "#fff0b3", tag: "Cozy pick", rating: 4.7, reviews: 77 },
 ];
-export const chips = ["Where's my order ORD1001?", "How long do refunds take?", "Is shipping free?", "I need a human"];
+export const chips = ["Where's my order ORD1001?", "How long do refunds take?", "Is shipping free?", "Cancel order ORD1003", "I need a human"];

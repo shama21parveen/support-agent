@@ -13,7 +13,7 @@ export default function Drawer({ open, close, items, change, total, clear, ask }
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const ship = total >= 499 ? 0 : 49, cod = f.pay === "COD" ? 40 : 0, grand = total + ship + cod;
   const codBlocked = total > 5000;
-  const valid = f.name.trim() && /^\d{10}$/.test(f.phone) && f.address.trim().length > 5 && !(f.pay === "COD" && codBlocked);
+  const valid = f.name.trim() && /^\d{10}$/.test(f.phone) && f.address.trim().length >= 3 && !(f.pay === "COD" && codBlocked);
 
   const shut = () => { close(); setTimeout(() => { if (step === "done") { setStep("cart"); setDone(null); } }, 300); };
   async function place() {
@@ -73,6 +73,7 @@ export default function Drawer({ open, close, items, change, total, clear, ask }
                 {cod > 0 && <div><span>COD fee</span><span>{inr(cod)}</span></div>}
               </div>
               <small className="hint">Demo checkout. No real payment is taken.</small>
+              {!valid && <small className="hint">Still needed: {[!f.name.trim() && "your name", !/^\d{10}$/.test(f.phone) && "a 10-digit phone", f.address.trim().length < 3 && "a full address"].filter(Boolean).join(", ")}</small>}
               {err && <small className="err">{err}</small>}
             </div>
             <footer>
