@@ -12,18 +12,25 @@ import orderRoutes from "./routes/order.routes.js";
 const app = express();
 app.set("trust proxy", 1); // Render ke proxy ke peeche sahi IP milne ke liye
 
-// Production mein sirf aapki website allow hogi. Local mein FRONTEND_URL nahi hota, toh sab allow.
-const origins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(",").map((s) => s.trim())
-  : true;
-app.use(cors({ origin: origins }));
+// FRONTEND_URL can hold one or more comma-separated site URLs.
+// Trailing slashes and spaces are cleaned up. If it is empty, every origin is allowed.
+const allowed = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((s) => s.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      const ok = !origin || allowed.length === 0 || allowed.includes(origin) || origin === "http://localhost:5173";
+      cb(null, ok);
+    },
+  })
+);
 app.use(express.json());
 
 app.get("/", (req, res) => res.json({ name: "Nova API", status: "ok" }));
-
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
+app.get("/health", (req, res) => res.json({ status: "ok" }));
 
 app.use(
   "/api",
