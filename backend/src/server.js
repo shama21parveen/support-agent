@@ -19,6 +19,8 @@ const origins = process.env.FRONTEND_URL
 app.use(cors({ origin: origins }));
 app.use(express.json());
 
+app.get("/", (req, res) => res.json({ name: "Nova API", status: "ok" }));
+
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
