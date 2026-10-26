@@ -23,7 +23,13 @@ export async function sendMessage(req, res) {
 
     res.json({ reply, actions, conversationId: conversation._id });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("Chat error:", err.status || "", String(err.message || err).slice(0, 200));
+    if (err.status === 429) {
+      return res.status(429).json({ error: "Nova has used up today's free AI quota. Please try again later." });
+    }
+    if (err.status === 503 || /timeout|timed out|abort/i.test(`${err.name} ${err.message}`)) {
+      return res.status(503).json({ error: "Nova is very busy right now. Please try again in a moment." });
+    }
+    res.status(500).json({ error: "Something went wrong. Please try again." });
   }
 }

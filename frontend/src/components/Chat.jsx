@@ -108,8 +108,9 @@ export default function Chat({ open, setOpen, ask }) {
       if (!r.ok) throw new Error(d.error);
       cid.current = d.conversationId;
       setMsgs((x) => [...x, { role: "assistant", text: d.reply, act: (d.actions || []).find((a) => a.type === "confirm_cancel") }]);
-    } catch {
-      setMsgs((x) => [...x, { role: "assistant", error: true, text: "Can't reach Nova right now. Make sure the backend is running on port 5000, then try again." }]);
+    } catch (e) {
+      const offline = e instanceof TypeError;
+      setMsgs((x) => [...x, { role: "assistant", error: true, text: offline ? "Can't reach Nova right now. Make sure the backend is running on port 5000, then try again." : e.message || "Something went wrong. Please try again." }]);
     }
     setBusy(false);
   }
